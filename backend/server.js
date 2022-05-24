@@ -15,16 +15,21 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json()); // body-ban erkezo json-t parse-olni tudja
 
-app.use([logger, auth]); // middlewares
+app.use([logger]); // middlewares
 
-app.get("/api/logic1", (req, res) => {
-  console.log("logic1");
-  res.send("hello template 1");
+app.get("/api/public", (req, res) => {
+  console.log("public");
+  res.send("hello template public");
 });
 
-app.get("/api/logic2", (req, res) => {
-  console.log("logic2");
-  res.send("hello template 2");
+app.get("/api/private", auth({ block: true }), (req, res) => {
+  console.log("private");
+  res.send(`hello template private, ${res.locals.userid}`);
+});
+
+app.get("/api/prublic", auth({ block: false }), (req, res) => {
+  if (!res.locals.userid) return res.send("hello world prublic");
+  res.send(`hello template prublic, your id is, ${res.locals.userid}`);
 });
 
 app.use(errorHandler);
