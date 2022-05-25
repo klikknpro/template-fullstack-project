@@ -4,7 +4,7 @@ const app = express();
 const cors = require("cors");
 const port = process.env.PORT;
 const logger = require("./middleware/logger");
-const auth = require("./middleware/auth");
+const auth = require("./middleware/auth"); // use this mw. on selected requests only
 const errorHandler = require("./middleware/errorHandler");
 
 const corsOptions = {
@@ -14,8 +14,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json()); // body-ban erkezo json-t parse-olni tudja
-
-app.use([logger]); // middlewares
+app.use([logger]); // use this middleware on every request
 
 app.get("/api/public", (req, res) => {
   console.log("public");
@@ -24,12 +23,12 @@ app.get("/api/public", (req, res) => {
 
 app.get("/api/private", auth({ block: true }), (req, res) => {
   console.log("private");
-  res.send(`hello template private, ${res.locals.userid}`);
+  res.send(`hello template private, your id is ${res.locals.userid}`);
 });
 
 app.get("/api/prublic", auth({ block: false }), (req, res) => {
   if (!res.locals.userid) return res.send("hello world prublic");
-  res.send(`hello template prublic, your id is, ${res.locals.userid}`);
+  res.send(`hello template prublic, your id is ${res.locals.userid}`);
 });
 
 app.use(errorHandler);
