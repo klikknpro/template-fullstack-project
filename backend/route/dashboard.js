@@ -1,26 +1,28 @@
 const router = require("express").Router();
-const { allDashboards } = require("../controller/dashboard");
+const { allDashboards, dashboardById, allTodos, todoById } = require("../controller/dashboard");
+const auth = require("../middleware/auth");
 
 /* these are REST endpoints */
-router.get("/api/dashboards", auth({ block: true }), allDashboards); // display the user's all dashboards
 
-router.get("/api/dashboards/:id", controller); // display one dashboard
+router.get("/", auth({ block: true }), allDashboards); // display the user's all dashboards
 
-router.get("/api/dashboards/:id/todos", controller);
+router.get("/:id", auth({ block: true }), dashboardById); // display one dashboard
 
-router.get("/api/dashboards/:id/todos/:id", controller);
+router.get("/:id/todos", auth({ block: true }), allTodos);
 
-router.post("/api/dashboards", controller); // create dashboard and send dashboard :id
+router.get("/:id/todos/:todoId", auth({ block: true }), todoById);
 
-router.post("/api/dashboards/:id/todos"); // create a todo and send todo :id back
+// router.post("", controller); // create dashboard and send dashboard :id
 
-router.patch("/api/dashboards/:id", controller); // update and send updated dashboard :id back
+// router.post("/:id/todos"); // create a todo and send todo :id back
 
-router.patch("/api/dashboards/:id/todos/:id", controller); // update and send updated todo :id back
+// router.patch("/:id", controller); // update and send updated dashboard :id back
 
-router.delete("/api/dashboards/:id", controller); // isDeleted: true ;)
+// router.patch("/:id/todos/:id", controller); // update and send updated todo :id back
 
-router.delete("/api/dashboards/:id/todos/:id", controller); // isDeleted: true ;)
+// router.delete("/:id", controller); // isDeleted: true ;)
+
+// router.delete("/:id/todos/:id", controller); // isDeleted: true ;)
 
 module.exports = router;
 

@@ -14,9 +14,13 @@ const dashboardSchema = new mongoose.Schema({
 const userSchema = new mongoose.Schema({
   username: { type: String, unique: true, required: true }, // empty string NONO!
   email: { type: String, unique: true, required: true }, // empty string NONO! + validation
-  password: { type: String, required: true }, // empty string NONO! + validation
+  googleId: { type: String, unique: true, required: true },
   dashboards: [dashboardSchema], // empty list is default?
 });
 
 const User = mongoose.model("user", userSchema);
 module.exports = User;
+
+/*
+todos: { type: todoSchema, default: () => [] }, // empty list is default?
+*/
