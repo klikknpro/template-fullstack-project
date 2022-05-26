@@ -16,24 +16,16 @@ app.use([logger]); // use this middleware on every request
 const dashboardRouter = require("./route/dashboard");
 app.use("/api/dashboards", dashboardRouter);
 
+/* tutorial */
+app.post("/user", (req, res) => {
+  res.sendStatus(200);
+});
+/* tutorial */
+
 app.use(errorHandler);
 
 module.exports = app;
 
 /*
-app.get("/api/public", (req, res) => {
-  console.log("public");
-  res.send("hello template public");
-});
-
-app.get("/api/private", auth({ block: true }), (req, res) => {
-  console.log("private");
-  res.send(`hello template private, your id is ${res.locals.userid}`);
-});
-
-app.get("/api/prublic", auth({ block: false }), (req, res) => {
-  if (!res.locals.userid) return res.send("hello world prublic");
-  res.send(`hello template prublic, your id is ${res.locals.userid}`);
-});
 
 */

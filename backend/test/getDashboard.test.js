@@ -1,24 +1,26 @@
 const app = require("../app");
-const mockserver = require("supertest");
+const mockServer = require("supertest");
 const { MongoMemoryServer } = require("mongodb-memory-server");
 const mongoose = require("mongoose");
 const User = require("../model/user");
 
 test("new user gets empty list", async () => {
   // given
-  // This will create an new instance of "MongoMemoryServer" and automatically start it
+  // fake mongo server
   const mongod = await MongoMemoryServer.create();
   const uri = mongod.getUri();
   const connection = await mongoose.connect(uri);
 
-  /// valami
+  // create dummy data
   const johnDoe = new User({
     username: "johnDoe",
     email: "john@doe.com",
     googleId: "dgsvfhjqbkj657",
   });
-  const client = mockserver.agent(app);
   await johnDoe.save();
+
+  // fake server
+  const client = mockServer.agent(app);
   client.set("authorization", johnDoe._id);
 
   // when
@@ -26,11 +28,10 @@ test("new user gets empty list", async () => {
 
   // then
   expect(response.status).toBe(200);
-
-  // console.log(response);
   const responseData = response.body;
   expect(responseData.user.dashboards).toStrictEqual([]);
 
+  // stop fake mongo
   await connection.disconnect();
   await mongod.stop();
 });
