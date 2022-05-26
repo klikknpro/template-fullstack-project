@@ -1,16 +1,16 @@
 const router = require("express").Router();
-const { allDashboards, dashboardById, allTodos, todoById } = require("../controller/dashboard");
+const { allDashboards } = require("../controller/dashboard");
 const auth = require("../middleware/auth");
 
 /* these are REST endpoints */
 
 router.get("/", auth({ block: true }), allDashboards); // display the user's all dashboards
 
-router.get("/:id", auth({ block: true }), dashboardById); // display one dashboard
+// router.get("/:id", auth({ block: true }), dashboardById); // display one dashboard
 
-router.get("/:id/todos", auth({ block: true }), allTodos);
+// router.get("/:id/todos", auth({ block: true }), allTodos);
 
-router.get("/:id/todos/:todoId", auth({ block: true }), todoById);
+// router.get("/:id/todos/:todoId", auth({ block: true }), todoById);
 
 // router.post("", controller); // create dashboard and send dashboard :id
 

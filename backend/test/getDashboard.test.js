@@ -1,5 +1,5 @@
 const app = require("../app");
-const mockServer = require("supertest");
+const mockserver = require("supertest");
 const { MongoMemoryServer } = require("mongodb-memory-server");
 const mongoose = require("mongoose");
 const User = require("../model/user");
@@ -17,7 +17,7 @@ test("new user gets empty list", async () => {
     email: "john@doe.com",
     googleId: "dgsvfhjqbkj657",
   });
-  const client = mockServer.agent(app);
+  const client = mockserver.agent(app);
   await johnDoe.save();
   client.set("authorization", johnDoe._id);
 
@@ -26,10 +26,11 @@ test("new user gets empty list", async () => {
 
   // then
   expect(response.status).toBe(200);
-  // const responseData = response.body;
-  // console.log(responseData);
-  // expect(responseData.user.dashboards).toStrictEqual([]);
-  // expect(response.body).toBe();
+
+  // console.log(response);
+  const responseData = response.body;
+  expect(responseData.user.dashboards).toStrictEqual([]);
+
   await connection.disconnect();
   await mongod.stop();
 });
