@@ -22,6 +22,7 @@ test("new user gets empty list", async () => {
   // fake server
   const client = mockServer.agent(app);
   client.set("authorization", johnDoe._id);
+  // can be multiple client.set();
 
   // when
   const response = await client.get("/api/dashboards");

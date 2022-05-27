@@ -20,6 +20,11 @@ const userRouter = require("./route/user");
 app.use("/user", userRouter);
 /* tutorial */
 
+app.get("/", (req, res) => {
+  console.log("Health check completed");
+  res.sendStatus(200);
+});
+
 app.use(errorHandler);
 
 module.exports = app;
