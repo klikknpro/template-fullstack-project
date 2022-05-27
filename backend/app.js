@@ -15,11 +15,9 @@ app.use([logger]); // use this middleware on every request
 
 const dashboardRouter = require("./route/dashboard");
 app.use("/api/dashboards", dashboardRouter);
-
 /* tutorial */
-app.post("/user", (req, res) => {
-  res.sendStatus(200);
-});
+const userRouter = require("./route/user");
+app.use("/user", userRouter);
 /* tutorial */
 
 app.use(errorHandler);
