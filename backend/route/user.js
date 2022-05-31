@@ -1,6 +1,9 @@
 const router = require("express").Router();
-const User = require("../model/user");
+const jwt = require("jsonwebtoken");
 const { user } = require("../controller/login");
+const httpModule = require("../util/http");
+const http = httpModule();
+const User = require("../model/user");
 
 const config = {
   google: {
@@ -35,20 +38,24 @@ router.post("/api/login", async (req, res) => {
   const link = configProvider.tokenEndpoint;
   const configProvider = config[provider];
 
-  let response;
-  try {
-    response = await http.post(link, {
-      code: code,
-      client_id: configProvider.clientId,
-      client_secret: configProvider.clientSecret,
-      redirect_uri: configProvider.redirectUri,
-      grant_type: "authorization_code",
-    });
-  } catch (err) {
-    return res.status(401).send();
-  }
+  // our own http module
+  const response = await http.post(link, {
+    code: code,
+    client_id: configProvider.clientId,
+    client_secret: configProvider.clientSecret,
+    redirect_uri: configProvider.redirectUri,
+    grant_type: "authorization_code",
+  });
 
-  //
+  if (!response) return res.sendStatus(500);
+  if (response.status !== 200) return res.status(400).send("Nice try");
+
+  const decoded = jwt.decode(response.data.id_token);
+  if (!decoded) return res.status(500).send("Provider error");
+
+  // find user if exists
+  const key = "providers" + provider;
+  const user = await User.find({ [key]: decoded.sub });
 });
 
 /* tutorial */
