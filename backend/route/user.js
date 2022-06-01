@@ -55,7 +55,20 @@ router.post("/api/login", async (req, res) => {
 
   // find user if exists
   const key = "providers" + provider;
-  const user = await User.find({ [key]: decoded.sub });
+  const user = await User.findOneAndUpdate(
+    { [key]: decoded.sub },
+    {
+      providers: {
+        [provider]: decoded.sub,
+      },
+    },
+    {
+      upsert: true,
+    }
+  );
+
+  const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: "1h" });
+  res.status(200).json(token);
 });
 
 /* tutorial */
