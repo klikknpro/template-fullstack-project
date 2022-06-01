@@ -7,10 +7,10 @@ const User = require("../model/user");
 
 const config = {
   google: {
-    clientId: "",
-    clientSecret: "",
-    redirectUri: "",
-    tokenEndpoint: "",
+    clientId: "651816047225-1us03r4vchvce7h51t0c49f4u0ip7ubm.apps.googleusercontent.com",
+    clientSecret: "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",
+    redirectUri: "http://localhost:3000/callback",
+    tokenEndpoint: "https://oauth2.googleapis.com/token",
   },
   // facebook: {
   //   clientId: "",
@@ -26,7 +26,7 @@ const config = {
   // },
 };
 
-router.post("/api/login", async (req, res) => {
+router.post("/login", async (req, res) => {
   const payload = req.body;
   if (!payload) return res.status(400).send("Nice try");
 
@@ -35,8 +35,8 @@ router.post("/api/login", async (req, res) => {
   if (!code || !provider) return res.status(400).send("Nice try");
   if (Object.keys(config).includes("provider")) return res.status(400).send("Nice try");
 
-  const link = configProvider.tokenEndpoint;
   const configProvider = config[provider];
+  const link = configProvider.tokenEndpoint;
 
   // our own http module
   const response = await http.post(link, {
@@ -47,14 +47,14 @@ router.post("/api/login", async (req, res) => {
     grant_type: "authorization_code",
   });
 
-  if (!response) return res.sendStatus(500);
+  if (!response) return res.status(500).send("google error");
   if (response.status !== 200) return res.status(400).send("Nice try");
 
   const decoded = jwt.decode(response.data.id_token);
   if (!decoded) return res.status(500).send("Provider error");
 
   // find user if exists
-  const key = "providers" + provider;
+  const key = `providers.${provider}`;
   const user = await User.findOneAndUpdate(
     { [key]: decoded.sub },
     {
@@ -63,7 +63,7 @@ router.post("/api/login", async (req, res) => {
       },
     },
     {
-      upsert: true,
+      new: true,
     }
   );
 
@@ -76,3 +76,9 @@ router.post("/", user);
 /* tutorial */
 
 module.exports = router;
+
+/*
+"https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=651816047225-1us03r4vchvce7h51t0c49f4u0ip7ubm.apps.googleusercontent.com&redirect_uri=http://localhost:3000/callback&scope=openid%20email&prompt=select_account"
+
+mongoose: 5.13.3
+*/
