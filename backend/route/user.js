@@ -64,6 +64,7 @@ router.post("/login", async (req, res) => {
     },
     {
       new: true,
+      upsert: true,
     }
   );
 
@@ -79,6 +80,4 @@ module.exports = router;
 
 /*
 "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=651816047225-1us03r4vchvce7h51t0c49f4u0ip7ubm.apps.googleusercontent.com&redirect_uri=http://localhost:3000/callback&scope=openid%20email&prompt=select_account"
-
-mongoose: 5.13.3
 */
