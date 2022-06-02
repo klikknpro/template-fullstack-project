@@ -11,14 +11,17 @@ const config = {
     clientSecret: "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",
     redirectUri: "http://localhost:3000/callback",
     tokenEndpoint: "https://oauth2.googleapis.com/token",
+    scope: "openid",
+  },
+  github: {
+    clientId: "a6b3d8e1c2c6c193dac2",
+    clientSecret: "7c566a9529bc9ef3dee18af40e183ec31e768291",
+    redirectUri: "http://localhost:3000/callback/github",
+    tokenEndpoint: "https://github.com/login/oauth/access_token",
+    scope: "user",
+    userEndpoint: "https://api.github.com/user", // header: { authorization: Bearer <access_token> }
   },
   // facebook: {
-  //   clientId: "",
-  //   clientSecret: "",
-  //   redirectUri: "",
-  //   tokenEndpoint: "",
-  // },
-  // github: {
   //   clientId: "",
   //   clientSecret: "",
   //   redirectUri: "",
@@ -50,16 +53,34 @@ router.post("/login", async (req, res) => {
   if (!response) return res.status(500).send("google error");
   if (response.status !== 200) return res.status(400).send("Nice try");
 
-  const decoded = jwt.decode(response.data.id_token);
-  if (!decoded) return res.status(500).send("Provider error");
+  let oId;
+  const onlyOauth = !response.data.id_token;
+  if (onlyOauth) {
+    const userResponse = await http.post(
+      link.userEndpoint,
+      {},
+      {
+        headers: {
+          authorization: `Bearer ${response.data.access_token}`,
+        },
+      }
+    );
+    if (!response) return res.status(500).send("provider error");
+    if (response.status !== 200) return res.status(400).send("Nice try");
+    oId = userResponse.data.id;
+  } else {
+    const decoded = jwt.decode(response.data.id_token);
+    if (!decoded) return res.status(500).send("decoded error");
+    oId = decoded.sub;
+  }
 
   // find user if exists
   const key = `providers.${provider}`;
   const user = await User.findOneAndUpdate(
-    { [key]: decoded.sub },
+    { [key]: oId },
     {
       providers: {
-        [provider]: decoded.sub,
+        [provider]: oId,
       },
     },
     {
@@ -79,5 +100,12 @@ router.post("/", user);
 module.exports = router;
 
 /*
+google:
 "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=651816047225-1us03r4vchvce7h51t0c49f4u0ip7ubm.apps.googleusercontent.com&redirect_uri=http://localhost:3000/callback&scope=openid%20email&prompt=select_account"
+
+github:
+https://github.com/login/oauth/authorize?response_type=code&client_id=a6b3d8e1c2c6c193dac2&redirect_uri=http://localhost:3000/callback/github&scope=user%20email&prompt=select_account
+
+http://localhost:3000/callback/github
+
 */

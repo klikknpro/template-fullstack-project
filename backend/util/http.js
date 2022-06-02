@@ -6,9 +6,9 @@ const http = (baseUrl) => {
     timeout: 3000,
   });
 
-  const post = async (url, body) => {
+  const post = async (url, body, options) => {
     try {
-      const response = await instance.post(url, body);
+      const response = await instance.post(url, body, options);
       return response;
     } catch (err) {
       console.log(err);
