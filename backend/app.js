@@ -17,6 +17,7 @@ const dashboardRoutes = require("./route/dashboard");
 app.use("/api/dashboards", dashboardRoutes);
 const userRoutes = require("./route/user.js");
 app.use("/api/user", userRoutes);
+
 /* tutorial */
 const userRouter = require("./route/user");
 app.use("/user", userRouter);

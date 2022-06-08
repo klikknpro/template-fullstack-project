@@ -1,7 +1,7 @@
 const User = require("../model/user");
 
 const allDashboards = async (req, res) => {
-  const user = await User.findById(res.locals.userid);
+  const user = await User.findById(res.locals.user.userId);
   res.json({ user }); // = {user: user}
 };
 
