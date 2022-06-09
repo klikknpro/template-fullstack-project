@@ -1,4 +1,4 @@
-const app = require("../app");
+/* const app = require("../app");
 const mockServer = require("supertest");
 
 describe("post request to /user", () => {
@@ -41,3 +41,4 @@ describe("post request to /user", () => {
     });
   });
 });
+ */

@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
-const { user } = require("../controller/login");
 const httpModule = require("../util/http");
 const http = httpModule();
 const User = require("../model/user");
@@ -102,10 +101,6 @@ router.post("/login", async (req, res) => {
   const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: "1h" });
   res.status(200).json(token);
 });
-
-/* tutorial */
-router.post("/", user);
-/* tutorial */
 
 module.exports = router;
 
