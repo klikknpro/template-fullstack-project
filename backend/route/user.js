@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const httpModule = require("../util/http");
 const http = httpModule();
 const User = require("../model/user");
+const auth = require("../middleware/auth");
 
 const config = {
   google: {
@@ -29,7 +30,7 @@ const config = {
   // },
 };
 
-router.post("/login", async (req, res) => {
+router.post("/login", auth({ block: false }), async (req, res) => {
   const payload = req.body;
   if (!payload) return res.status(400).send("Nice try");
 
@@ -74,8 +75,8 @@ router.post("/login", async (req, res) => {
         },
       }
     );
-    if (!response) return res.status(500).send("provider error");
-    if (response.status !== 200) return res.status(400).send("Nice try");
+    if (!userResponse) return res.status(500).send("provider error");
+    if (userResponse.status !== 200) return res.status(400).send("Nice try");
     oId = userResponse.data.id;
   } else {
     const decoded = jwt.decode(response.data.id_token);
@@ -83,22 +84,34 @@ router.post("/login", async (req, res) => {
     oId = decoded.sub;
   }
 
-  // find user if exists
   const key = `providers.${provider}`;
-  const user = await User.findOneAndUpdate(
-    { [key]: oId },
-    {
-      providers: {
-        [provider]: oId,
-      },
-    },
-    {
-      new: true,
-      upsert: true,
-    }
-  );
+  let user = await User.findOne({ [key]: oId });
+  if (user && res.locals.user?.providers) {
+    user.providers = { ...user.providers, ...res.locals.user.providers };
+    user = await user.save();
+  }
 
-  const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: "1h" });
+  const token = jwt.sign(
+    { userId: user?._id, providers: user ? user.providers : { [provider]: oId } },
+    process.env.SECRET_KEY,
+    { expiresIn: "1h" }
+  ); // conditional chaining bro
+  res.status(200).json(token);
+
+  /*
+  itt FE-en ha nincs userid a most visszakuldott tokenben, akkor latni fog egy formot, csinaljon profilt !!!!
+  */
+});
+
+router.post("/create", auth({ block: true }), async (req, res) => {
+  if (!req.body?.username) return res.sendStatus(400);
+
+  const user = await User.create({
+    username: req.body.username,
+    providers: res.locals.user.providers,
+  });
+
+  const token = jwt.sign({ userId: user._id, providers: user.providers }, process.env.SECRET_KEY, { expiresIn: "1h" });
   res.status(200).json(token);
 });
 
