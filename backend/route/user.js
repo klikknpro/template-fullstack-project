@@ -19,15 +19,9 @@ const config = {
     redirectUri: "http://localhost:3000/callback/github",
     tokenEndpoint: "https://github.com/login/oauth/access_token",
     scope: "user",
-    userEndpoint: "https://api.github.com/user", // header: { authorization: Bearer <access_token> }
+    userEndpoint: "https://api.github.com/user", // need this if provider is OAuth compatible only
     user_id: "id",
   },
-  // facebook: {
-  //   clientId: "",
-  //   clientSecret: "",
-  //   redirectUri: "",
-  //   tokenEndpoint: "",
-  // },
 };
 
 router.post("/login", auth({ block: false }), async (req, res) => {
@@ -37,9 +31,9 @@ router.post("/login", auth({ block: false }), async (req, res) => {
   const code = payload.code;
   const provider = payload.provider;
   if (!code || !provider) return res.status(400).send("Nice try");
-  if (Object.keys(config).includes("provider")) return res.status(400).send("Nice try");
+  if (!Object.keys(config).includes(provider)) return res.status(400).send("Nice try");
 
-  const configProvider = config[provider];
+  const configProvider = config[provider]; // google or github
   const link = configProvider.tokenEndpoint;
 
   // our own http module
@@ -59,19 +53,19 @@ router.post("/login", auth({ block: false }), async (req, res) => {
     }
   );
 
-  if (!response) return res.status(500).send("google error");
+  if (!response) return res.status(500).send("token provider error");
   if (response.status !== 200) return res.status(400).send("Nice try");
 
   let oId;
   const onlyOauth = !response.data.id_token;
   if (onlyOauth) {
-    let token = response.data.access_token;
+    let accessToken = response.data.access_token;
     const userResponse = await http.post(
       configProvider.userEndpoint,
       {},
       {
         headers: {
-          authorization: "Bearer " + token,
+          authorization: "Bearer " + accessToken,
         },
       }
     );
@@ -80,14 +74,14 @@ router.post("/login", auth({ block: false }), async (req, res) => {
     oId = userResponse.data.id;
   } else {
     const decoded = jwt.decode(response.data.id_token);
-    if (!decoded) return res.status(500).send("decoded error");
+    if (!decoded) return res.status(500).send("provider token error");
     oId = decoded.sub;
   }
 
   const key = `providers.${provider}`;
   let user = await User.findOne({ [key]: oId });
   if (user && res.locals.user?.providers) {
-    user.providers = { ...user.providers, ...res.locals.user.providers };
+    user.providers = { ...user.providers, ...res.locals.user.providers }; // append a new provider to its existing one
     user = await user.save();
   }
 
