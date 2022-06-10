@@ -1,29 +1,10 @@
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
-const httpModule = require("../util/http");
-const http = httpModule();
+const http = require("../util/http");
+// const http = httpModule();
 const User = require("../model/user");
 const auth = require("../middleware/auth");
 const config = require("../app.config");
-
-/* const config = {
-  google: {
-    clientId: "651816047225-1us03r4vchvce7h51t0c49f4u0ip7ubm.apps.googleusercontent.com",
-    clientSecret: "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",
-    redirectUri: "http://localhost:3000/callback",
-    tokenEndpoint: "https://oauth2.googleapis.com/token",
-    scope: "openid",
-  },
-  github: {
-    clientId: "a6b3d8e1c2c6c193dac2",
-    clientSecret: "7c566a9529bc9ef3dee18af40e183ec31e768291",
-    redirectUri: "http://localhost:3000/callback/github",
-    tokenEndpoint: "https://github.com/login/oauth/access_token",
-    scope: "user",
-    userEndpoint: "https://api.github.com/user", // need this if provider is OAuth compatible only
-    user_id: "id",
-  },
-}; */
 
 router.post("/login", auth({ block: false }), async (req, res) => {
   const payload = req.body;

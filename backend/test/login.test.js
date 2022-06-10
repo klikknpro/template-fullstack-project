@@ -5,6 +5,7 @@ const mockServer = require("supertest");
 // const { MongoMemoryServer } = require("mongodb-memory-server");
 const User = require("../model/user");
 const { startDb, stopDb, deleteAll } = require("./util/inMemoryDb");
+const { setupGoogleSuccessResponse } = require("./util/httpMock");
 
 describe("POST requests to api/user/login", () => {
   let connection;
@@ -71,5 +72,21 @@ describe("POST requests to api/user/login", () => {
 
     // then
     expect(response.status).toBe(400);
+  });
+
+  test("should return 200 with valid provider id (user not created)", async () => {
+    // given
+    const code = "4/0AX4XfWigRi0tflCcAhGM5WngKa5_199L1dJjayorTpuSj0z4AlQbnIyZSs78wBXHO3HG_g";
+    const provider = "google";
+    setupGoogleSuccessResponse("7458tygbhf78");
+
+    // when
+    const response = await client.post("/api/user/login").send({
+      code,
+      provider,
+    });
+
+    // then
+    expect(response.status).toBe(200);
   });
 });

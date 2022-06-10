@@ -2,7 +2,7 @@ const { default: axios } = require("axios");
 
 const http = (baseUrl) => {
   const instance = axios.create({
-    baseURL: baseUrl || "",
+    baseURL: "",
     timeout: 3000,
   });
 
@@ -15,30 +15,11 @@ const http = (baseUrl) => {
       return err.reponse;
     }
   };
-  return { post };
+  return { post, _instance: instance }; // _private_stuff
 };
 
-module.exports = http;
+module.exports = http();
 
 /*
-const { default: axios } = require("axios");
 
-const http = (baseurl) => {
-  const instance = axios.create({
-    baseURL: baseurl || "",
-    timeout: 3000,
-  });
-  const post = async (...params) => {
-    try {
-      const response = await instance.post(...params);
-      console.log("BODY:", response.data);
-      return response;
-    } catch (err) {
-      return err.response;
-    }
-  };
-  return { post };
-};
-
-module.exports = http;
 */
