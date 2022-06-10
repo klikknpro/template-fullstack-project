@@ -9,4 +9,8 @@ const setupGoogleSuccessResponse = (sub) => {
   mock.onPost("https://oauth2.googleapis.com/token").replyOnce(200, { id_token: token });
 };
 
-module.exports = { setupGoogleSuccessResponse };
+const setupGoogleErrorResponse = () => {
+  mock.onPost("https://oauth2.googleapis.com/token").replyOnce(401);
+};
+
+module.exports = { setupGoogleSuccessResponse, setupGoogleErrorResponse };

@@ -1,6 +1,6 @@
-const { default: axios } = require("axios");
+const axios = require("axios");
 
-const http = (baseUrl) => {
+const http = () => {
   const instance = axios.create({
     baseURL: "",
     timeout: 3000,
@@ -11,8 +11,8 @@ const http = (baseUrl) => {
       const response = await instance.post(...params);
       return response;
     } catch (err) {
-      console.log(err);
-      return err.reponse;
+      if (!err.response) return err;
+      return err.response;
     }
   };
   return { post, _instance: instance }; // _private_stuff

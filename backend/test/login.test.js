@@ -2,10 +2,9 @@ require("dotenv").config();
 const app = require("../app");
 const jwt = require("jsonwebtoken");
 const mockServer = require("supertest");
-// const { MongoMemoryServer } = require("mongodb-memory-server");
 const User = require("../model/user");
 const { startDb, stopDb, deleteAll } = require("./util/inMemoryDb");
-const { setupGoogleSuccessResponse } = require("./util/httpMock");
+const { setupGoogleSuccessResponse, setupGoogleErrorResponse } = require("./util/httpMock");
 
 describe("POST requests to api/user/login", () => {
   let connection;
@@ -19,12 +18,12 @@ describe("POST requests to api/user/login", () => {
     client = mockServer.agent(app);
   });
 
-  afterEach(async () => {
-    await deleteAll(User);
-  });
-
   afterAll(async () => {
     await stopDb(connection, server);
+  });
+
+  afterEach(async () => {
+    await deleteAll(User);
   });
 
   test("should return 400 without body", async () => {
@@ -88,5 +87,45 @@ describe("POST requests to api/user/login", () => {
 
     // then
     expect(response.status).toBe(200);
+  });
+
+  test("should return 200 with jwt valid provider id (user not created)", async () => {
+    // given
+    const code = "4/0AX4XfWigRi0tflCcAhGM5WngKa5_199L1dJjayorTpuSj0z4AlQbnIyZSs78wBXHO3HG_g";
+    const provider = "google";
+    const googleUserId = "vshdg674t7ryfgb";
+    setupGoogleSuccessResponse(googleUserId);
+
+    // when
+    const response = await client.post("/api/user/login").send({
+      code,
+      provider,
+    });
+
+    // then
+    expect(response.status).toBe(200);
+    const responseToken = jwt.decode(response.body);
+    expect(responseToken.providers.google).toBe(googleUserId);
+    const users = await User.find();
+    expect(users).toStrictEqual([]);
+  });
+
+  test("should return 401 with invalid code (user not created)", async () => {
+    // given
+    const code = "4/0AX4XfWigRi0tflCcAhGM5WngKa5_199L1dJjayorTpuSj0z4AlQbnIyZSs78wBXHO3HG_g";
+    const provider = "google";
+    setupGoogleErrorResponse();
+
+    // when
+    const response = await client.post("/api/user/login").send({
+      code,
+      provider,
+    });
+
+    // then
+    expect(response.status).toBe(401);
+    expect(response.body).toStrictEqual({});
+    const users = await User.find();
+    expect(users).toStrictEqual([]);
   });
 });

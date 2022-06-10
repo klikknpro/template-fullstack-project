@@ -1,7 +1,6 @@
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
 const http = require("../util/http");
-// const http = httpModule();
 const User = require("../model/user");
 const auth = require("../middleware/auth");
 const config = require("../app.config");
@@ -35,8 +34,8 @@ router.post("/login", auth({ block: false }), async (req, res) => {
     }
   );
 
-  if (!response) return res.status(500).send("token provider error");
-  if (response.status !== 200) return res.status(400).send("Nice try");
+  if (!response) return res.status(500).send("Token provider error");
+  if (response.status !== 200) return res.status(401).send("Nice try");
 
   let oId;
   const onlyOauth = !response.data.id_token;
@@ -52,7 +51,7 @@ router.post("/login", auth({ block: false }), async (req, res) => {
       }
     );
     if (!userResponse) return res.status(500).send("provider error");
-    if (userResponse.status !== 200) return res.status(400).send("Nice try");
+    if (userResponse.status !== 200) return res.status(401).send("Nice try");
     oId = userResponse.data.id;
   } else {
     const decoded = jwt.decode(response.data.id_token);
@@ -104,4 +103,6 @@ https://github.com/login/oauth/authorize?response_type=code&client_id=a6b3d8e1c2
 
 http://localhost:3000/callback/github
 
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm92aWRlcnMiOnsiZ29vZ2xlIjoiMTA4NjExNjkzODMyNzQ3Mzk1Mjg0In0sImlhdCI6MTY1NDg1OTE2NiwiZXhwIjoxNjU0ODYyNzY2fQ.3bsjd1fhZxiYHVTb48FZPdJwlMk0jjx9oki0QsIAP20
 */
