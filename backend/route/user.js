@@ -4,8 +4,9 @@ const httpModule = require("../util/http");
 const http = httpModule();
 const User = require("../model/user");
 const auth = require("../middleware/auth");
+const config = require("../app.config");
 
-const config = {
+/* const config = {
   google: {
     clientId: "651816047225-1us03r4vchvce7h51t0c49f4u0ip7ubm.apps.googleusercontent.com",
     clientSecret: "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",
@@ -22,7 +23,7 @@ const config = {
     userEndpoint: "https://api.github.com/user", // need this if provider is OAuth compatible only
     user_id: "id",
   },
-};
+}; */
 
 router.post("/login", auth({ block: false }), async (req, res) => {
   const payload = req.body;
@@ -31,9 +32,9 @@ router.post("/login", auth({ block: false }), async (req, res) => {
   const code = payload.code;
   const provider = payload.provider;
   if (!code || !provider) return res.status(400).send("Nice try");
-  if (!Object.keys(config).includes(provider)) return res.status(400).send("Nice try");
+  if (!Object.keys(config.auth).includes(provider)) return res.status(400).send("Nice try");
 
-  const configProvider = config[provider]; // google or github
+  const configProvider = config.auth[provider]; // google or github
   const link = configProvider.tokenEndpoint;
 
   // our own http module
@@ -79,7 +80,9 @@ router.post("/login", auth({ block: false }), async (req, res) => {
   }
 
   const key = `providers.${provider}`;
-  let user = await User.findOne({ [key]: oId });
+  // console.log(key);
+  // console.log("oId: ", oId);
+  let user = await User.findOne({ [key]: oId }); // already "registered" user in DB
   if (user && res.locals.user?.providers) {
     user.providers = { ...user.providers, ...res.locals.user.providers }; // append a new provider to its existing one
     user = await user.save();
