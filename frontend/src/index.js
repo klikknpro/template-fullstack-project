@@ -9,10 +9,10 @@ import { CounterProvider } from "./CounterProvider";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <BrowserRouter>
-    <CounterProvider>
+  <CounterProvider>
+    <BrowserRouter>
       <App />
-    </CounterProvider>
-  </BrowserRouter>
+    </BrowserRouter>
+  </CounterProvider>
 );
 // reportWebVitals();

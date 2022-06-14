@@ -3,7 +3,7 @@ const CounterContext = createContext();
 
 // custom hook bro
 const useCounter = () => {
-  return useContext(CounterContext);
+  return useContext(CounterContext); // read the context and subscribe to its changes
 };
 
 const CounterProvider = ({ children }) => {
@@ -17,9 +17,11 @@ const CounterProvider = ({ children }) => {
     setValue(value - 1);
   };
 
-  const contextValue = { increment, decrement, value };
-
-  return <CounterContext.Provider value={{ increment, decrement, value }}>{children}</CounterContext.Provider>;
+  return <CounterContext.Provider value={{ increment, decrement, value }}>{children}</CounterContext.Provider>; // provide value for my context
 };
 
 export { CounterProvider, useCounter };
+
+/*
+my CounterContext must be the same in useContext(here), and in return <here.provider/>
+*/

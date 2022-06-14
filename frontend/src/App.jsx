@@ -1,25 +1,24 @@
 import { React, useEffect, useState } from "react";
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
-import NumberPresenter from "./components/NumberPresenter";
-import NumberModifier from "./components/NumberModifier";
+import Home from "./pages/Home";
+import About from "./pages/About";
+import Profile from "./pages/Profile";
 import { useCounter } from "./CounterProvider";
+import Navbar from "./components/Navbar";
 
 function App() {
+  const navigate = useNavigate();
   const { value, increment, decrement } = useCounter(); //custom hook bro!
 
   return (
     <div className="App">
-      <h4>Counter</h4>
-      <p>Value: {value}</p>
-      <Button onClick={decrement} variant="contained" size="small">
-        -
-      </Button>
-      <Button onClick={increment} variant="contained" size="small">
-        +
-      </Button>
-      <NumberPresenter />
-      <NumberModifier />
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/profile" element={<Profile />} />
+      </Routes>
     </div>
   );
 }
