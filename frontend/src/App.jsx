@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Profile from "./pages/Profile";
-import { useCounter } from "./CounterProvider";
+import { useCounter } from "./providers/counter";
 import Navbar from "./components/Navbar";
 
 function App() {
