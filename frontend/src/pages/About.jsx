@@ -4,13 +4,13 @@ import { useCounter } from "../hooks/useCounter";
 import { useCounter as useGlobalCounter } from "../providers/counter";
 
 const About = () => {
-  const { counter, increment, decrement } = useCounter();
+  const { counter, increment, decrement } = useCounter("About");
   const { value, increment: goUp, decrement: goDown } = useGlobalCounter();
 
   return (
     <div>
       <h3>About</h3>
-      <h4>Number: {counter}</h4>
+      <h4>Counter: {counter}</h4>
       <Button onClick={decrement} variant="contained" size="small">
         -
       </Button>
