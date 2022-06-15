@@ -2,10 +2,13 @@ import { React, useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import { useCounter } from "../hooks/useCounter";
 import { useCounter as useGlobalCounter } from "../providers/counter";
+import { useAuth } from "../providers/auth";
 
 const Home = () => {
   const { counter, increment, decrement } = useCounter("Home");
   const { value, increment: goUp, decrement: goDown } = useGlobalCounter();
+
+  const { auth } = useAuth();
 
   return (
     <div>
@@ -23,6 +26,9 @@ const Home = () => {
       </Button>
       <Button onClick={goUp} variant="contained" size="small">
         +
+      </Button>
+      <Button onClick={auth} variant="contained" color="info" size="small">
+        Google login
       </Button>
     </div>
   );
