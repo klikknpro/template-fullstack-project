@@ -1,4 +1,4 @@
-import { React, useState, useContext, createContext } from "react";
+import { React, useState, useContext, createContext, useEffect } from "react";
 import http from "axios";
 const AuthContext = createContext();
 
@@ -27,15 +27,24 @@ const AuthProvider = ({ children }) => {
       });
       console.log("data", response.data);
       setToken(response.data.token);
+      localStorage.setItem("token", response.data.token);
     } catch (err) {
       console.log(err);
       setToken(null);
+      localStorage.removeItem("token");
     }
   };
 
   const logout = () => {
     setToken(null);
+    localStorage.removeItem("token");
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) setToken(token);
+    // eslint-disable-next-line
+  }, []);
 
   return <AuthContext.Provider value={{ token, auth, logout, login }}>{children}</AuthContext.Provider>; // provide value for my context
 };

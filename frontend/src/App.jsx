@@ -5,6 +5,7 @@ import About from "./pages/About";
 import Profile from "./pages/Profile";
 import Navbar from "./components/Navbar";
 import Callback from "./pages/Callback";
+import Protected from "./components/Protected";
 
 function App() {
   return (
@@ -13,7 +14,14 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route
+          path="/profile"
+          element={
+            <Protected>
+              <Profile /> {/* guarded route */}
+            </Protected>
+          }
+        />
         <Route path="/callback" element={<Callback />} />
       </Routes>
     </div>
@@ -23,11 +31,5 @@ function App() {
 export default App;
 
 /*
-The Riddle:
-hint: context
-1db useCounter hook!!!
-home-ba
-profile-ba
-sajat, de megorzi a sajatjat re-render eseten
-es nem local/session storage
+
 */
