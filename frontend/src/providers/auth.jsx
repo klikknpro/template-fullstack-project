@@ -16,7 +16,7 @@ const AuthProvider = ({ children }) => {
     searchParams.append("prompt", "select_account");
 
     const completeUrl = googleBaseUrl + "?" + searchParams.toString();
-    window.open(completeUrl);
+    window.open(completeUrl, "_self");
   };
 
   const login = async (code, provider) => {

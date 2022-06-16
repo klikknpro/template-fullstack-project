@@ -8,7 +8,7 @@ const Home = () => {
   const { counter, increment, decrement } = useCounter("Home");
   const { value, increment: goUp, decrement: goDown } = useGlobalCounter();
 
-  const { auth, token } = useAuth();
+  const { token } = useAuth();
 
   return (
     <div>
@@ -27,9 +27,6 @@ const Home = () => {
       </Button>
       <Button onClick={goUp} variant="contained" size="small">
         +
-      </Button>
-      <Button onClick={auth} variant="contained" color="info" size="small">
-        Google login
       </Button>
     </div>
   );
