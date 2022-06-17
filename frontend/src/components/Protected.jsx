@@ -1,17 +1,29 @@
 import { React, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../providers/auth";
 
 const Protected = ({ children }) => {
-  const { token } = useAuth();
-  const navigate = useNavigate();
+  const { token, user } = useAuth();
+  // const navigate = useNavigate();
+  const location = useLocation();
 
-  useEffect(() => {
-    if (!token) navigate("/");
-    // eslint-disable-next-line
-  }, [token]);
+  // useEffect(() => {
+  //   if (!token) navigate("/");
+  //   if (!user.userId) return navigate("/register");
+  //   // eslint-disable-next-line
+  // }, [token, user]);
 
-  return <div>{children}</div>;
+  return (
+    <div>
+      {!token ? (
+        <Navigate to={"/"} />
+      ) : !user.userId && location.pathname !== "/register" ? (
+        <Navigate to={"/register"} />
+      ) : (
+        children
+      )}
+    </div>
+  );
 };
 
 export default Protected;
