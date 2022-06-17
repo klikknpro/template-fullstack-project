@@ -1,11 +1,13 @@
 import { React, useState, useContext, createContext, useEffect } from "react";
 import http from "axios";
 import jwt from "jwt-decode";
+import { todoApi } from "../api/todoApi";
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
+  const { post } = todoApi();
 
   const auth = () => {
     const googleBaseUrl = "https://accounts.google.com/o/oauth2/v2/auth";
@@ -42,6 +44,15 @@ const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
   };
 
+  const register = async (username) => {
+    const response = await post("user/create", { username });
+    if (response?.status === 200) {
+      setToken(response.data.token);
+      localStorage.setItem("token", response.data.token);
+      setUser(jwt(response.data.token));
+    }
+  };
+
   useEffect(() => {
     const tokenInStorage = localStorage.getItem("token");
     if (tokenInStorage) {
@@ -52,7 +63,7 @@ const AuthProvider = ({ children }) => {
     // eslint-disable-next-line
   }, []);
 
-  return <AuthContext.Provider value={{ token, user, auth, logout, login }}>{children}</AuthContext.Provider>; // provide value for my context
+  return <AuthContext.Provider value={{ token, user, auth, logout, login, register }}>{children}</AuthContext.Provider>; // provide value for my context
 };
 
 // custom hook bro
