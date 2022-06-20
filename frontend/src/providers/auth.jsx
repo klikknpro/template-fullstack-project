@@ -25,7 +25,7 @@ const AuthProvider = ({ children }) => {
 
   const login = async (code, provider) => {
     try {
-      const response = await http.post("http://localhost:4000/api/user/login", {
+      const response = await http.post("http://localhost:8080/api/user/login", {
         code,
         provider,
       });
